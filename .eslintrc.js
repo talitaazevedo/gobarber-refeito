@@ -15,9 +15,7 @@ module.exports = {
         "ecmaVersion": 2018,
         "sourceType": "module"
     },
-    "plugins": [
-        "@typescript-eslint"
-    ],
+    
     "rules": {
         "prettier/prettier": "error",
         "class-methods-use-this": "off",
