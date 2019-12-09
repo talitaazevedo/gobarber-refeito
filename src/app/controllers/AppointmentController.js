@@ -136,6 +136,11 @@ async index(req,res){
           model: User,
           as: 'provider',
           attributes:['name', 'email'],
+        },
+        {
+          model: User,
+          as: 'user',
+          attributes: ['name'],
         }
       ],
     });
@@ -153,10 +158,17 @@ async index(req,res){
 
     await appointment.save();
 
-    await Mail.sendmail({
+    Mail.sendmail({
       to:`${appointment.provider.name} <${appointment.provider.email}>`,
       subject: "Agendamento Cancelado",
-      text: 'Você tem um novo Cancelamento',
+      template: 'cancellation',
+      context:{
+        provider: appointment.provider.name,
+        user: appointment.user.name,
+        date: format(appointment.date,"'dia' dd 'de' MMMM', às'H:mm'h' ",{locale:pt,}),
+
+      }
+
 
 
     });
