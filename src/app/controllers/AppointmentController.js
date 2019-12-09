@@ -6,6 +6,8 @@ import File from '../models/File';
 import Appointment from '../models/Appointment';
 import Notification from '../schemas/Notification';
 
+import Mail from '../../lib/Mail';
+
 
 
 
@@ -128,7 +130,15 @@ async index(req,res){
 
   async delete(req,res){
 
-    const appointment = await Appointment.findByPk(req.params.id);
+    const appointment = await Appointment.findByPk(req.params.id,{
+      include:[
+        {
+          model: User,
+          as: 'provider',
+          attributes:['name', 'email'],
+        }
+      ],
+    });
     if(appointment.user_id !== req.userId){
       return res.status(401).json({error: "You don't have permission to cancle this appointment."});
     }
@@ -141,7 +151,16 @@ async index(req,res){
 
     appointment.canceled_at = new Date();
 
-    await appointment.save()
+    await appointment.save();
+
+    await Mail.sendmail({
+      to:`${appointment.provider.name} <${appointment.provider.email}>`,
+      subject: "Agendamento Cancelado",
+      text: 'Você tem um novo Cancelamento',
+
+
+    });
+
 
 
     return res.json(appointment);
